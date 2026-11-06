@@ -10,6 +10,8 @@
   const taskNameInput = document.getElementById('task-name');
   const taskDateInput = document.getElementById('task-date');
   const taskTimeInput = document.getElementById('task-time');
+  const taskStatusInput = document.getElementById('task-status');
+  const taskCategoryInput = document.getElementById('task-category');
 
   const searchInput = document.getElementById('search-input');
   const taskList = document.getElementById('task-list');
@@ -25,6 +27,8 @@
   const editTaskNameInput = document.getElementById('edit-task-name');
   const editTaskDateInput = document.getElementById('edit-task-date');
   const editTaskTimeInput = document.getElementById('edit-task-time');
+  const editTaskStatusInput = document.getElementById('edit-task-status');
+  const editTaskCategoryInput = document.getElementById('edit-task-category');
   const modalCloseBtn = document.getElementById('modal-close-btn');
   const editCancelBtn = document.getElementById('edit-cancel-btn');
 
@@ -47,7 +51,12 @@
   function loadTasks() {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
+      const parsed = data ? JSON.parse(data) : [];
+      return parsed.map(task => ({
+        ...task,
+        status: task.status || 'Pending',
+        category: task.category || 'Personal'
+      }));
     } catch (e) {
       console.error('Failed to load tasks from localStorage:', e);
       return [];
@@ -115,7 +124,9 @@
       const nameMatch = task.name.toLowerCase().includes(searchTerm);
       const dateMatch = task.date.toLowerCase().includes(searchTerm) || formatDate(task.date).toLowerCase().includes(searchTerm);
       const timeMatch = task.time.toLowerCase().includes(searchTerm) || formatTime(task.time).toLowerCase().includes(searchTerm);
-      return nameMatch || dateMatch || timeMatch;
+      const statusMatch = (task.status || '').toLowerCase().includes(searchTerm);
+      const categoryMatch = (task.category || '').toLowerCase().includes(searchTerm);
+      return nameMatch || dateMatch || timeMatch || statusMatch || categoryMatch;
     });
 
     // Clear current list
@@ -144,8 +155,9 @@
 
     // Populate task items
     filteredTasks.forEach(task => {
+      const isDone = (task.status || 'Pending') === 'Done';
       const li = document.createElement('li');
-      li.className = 'task-item';
+      li.className = `task-item ${isDone ? 'is-done' : ''}`;
       li.setAttribute('data-id', task.id);
 
       li.innerHTML = `
@@ -163,6 +175,12 @@
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
               </svg>
               ${escapeHtml(formatTime(task.time))}
+            </span>
+            <button type="button" class="meta-chip chip-status ${isDone ? 'chip-status-done' : 'chip-status-pending'}" data-action="toggle-status" data-id="${task.id}" title="Click to toggle Status">
+              ${isDone ? '✓ Done' : '⏳ Pending'}
+            </button>
+            <span class="meta-chip chip-category">
+              ${escapeHtml(task.category || 'Personal')}
             </span>
           </div>
         </div>
@@ -212,11 +230,16 @@
       return;
     }
 
+    const status = taskStatusInput.value || 'Pending';
+    const category = taskCategoryInput.value || 'Personal';
+
     const newTask = {
       id: Date.now().toString(),
       name,
       date,
       time,
+      status,
+      category,
       createdAt: Date.now()
     };
 
@@ -227,6 +250,8 @@
     // Reset input fields
     taskNameInput.value = '';
     taskTimeInput.value = '';
+    taskStatusInput.value = 'Pending';
+    taskCategoryInput.value = 'Personal';
     // Retain date for convenience or keep today's date
 
     renderTasks();
@@ -241,6 +266,8 @@
     editTaskNameInput.value = task.name;
     editTaskDateInput.value = task.date;
     editTaskTimeInput.value = task.time;
+    editTaskStatusInput.value = task.status || 'Pending';
+    editTaskCategoryInput.value = task.category || 'Personal';
 
     editModal.style.display = 'flex';
     editTaskNameInput.focus();
@@ -260,6 +287,8 @@
     const name = editTaskNameInput.value.trim();
     const date = editTaskDateInput.value;
     const time = editTaskTimeInput.value;
+    const status = editTaskStatusInput.value || 'Pending';
+    const category = editTaskCategoryInput.value || 'Personal';
 
     if (!name) {
       alert('Task name cannot be empty.');
@@ -284,11 +313,23 @@
       tasks[taskIndex].name = name;
       tasks[taskIndex].date = date;
       tasks[taskIndex].time = time;
+      tasks[taskIndex].status = status;
+      tasks[taskIndex].category = category;
       saveTasks();
       renderTasks();
     }
 
     closeEditModal();
+  }
+
+  // Toggle Status between Pending and Done
+  function toggleTaskStatus(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    task.status = (task.status === 'Done') ? 'Pending' : 'Done';
+    saveTasks();
+    renderTasks();
   }
 
   // Handle Delete Task with Confirmation
@@ -317,12 +358,16 @@
       renderTasks();
     });
 
-    // Event delegation for Edit and Delete buttons on the task list
+    // Event delegation for Status toggle, Edit and Delete buttons on the task list
     taskList.addEventListener('click', (e) => {
+      const toggleBtn = e.target.closest('[data-action="toggle-status"]');
       const editBtn = e.target.closest('.btn-edit');
       const deleteBtn = e.target.closest('.btn-delete');
 
-      if (editBtn) {
+      if (toggleBtn) {
+        const taskId = toggleBtn.getAttribute('data-id');
+        toggleTaskStatus(taskId);
+      } else if (editBtn) {
         const taskId = editBtn.getAttribute('data-id');
         openEditModal(taskId);
       } else if (deleteBtn) {

@@ -138,7 +138,8 @@ label {
 input[type="text"],
 input[type="date"],
 input[type="time"],
-input[type="search"] {
+input[type="search"],
+select {
   width: 100%;
   height: 44px;
   padding: 0 12px;
@@ -151,10 +152,15 @@ input[type="search"] {
   outline: none;
 }
 
+select {
+  cursor: pointer;
+}
+
 input[type="text"]:focus,
 input[type="date"]:focus,
 input[type="time"]:focus,
-input[type="search"]:focus {
+input[type="search"]:focus,
+select:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
@@ -300,6 +306,42 @@ input[type="search"]:focus {
 
 .meta-chip svg {
   color: var(--text-muted);
+}
+
+.chip-status {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+
+.chip-status:hover {
+  filter: brightness(0.92);
+}
+
+.chip-status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.chip-status-done {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.chip-category {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+}
+
+.task-item.is-done {
+  border-color: #bbf7d0;
+  background-color: #fbfdfc;
+}
+
+.task-item.is-done .task-title {
+  text-decoration: line-through;
+  color: #64748b;
 }
 
 /* Task Action Buttons */

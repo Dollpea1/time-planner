@@ -9,7 +9,7 @@ Try the app directly in your browser:
 
 ## Features
 
-- **Add Tasks**: Plan tasks with Task Name, Date, and Time.
+- **Add Tasks**: Task name, Date, Time, Status (Pending or Done), Category (e.g. Work, Personal, Study).
 - **Task List**: Clean, legible list displaying formatted dates and times.
 - **Edit Tasks**: Update task details on the fly with a dedicated edit modal.
 - **Delete Tasks**: Safe deletion with a confirmation prompt before removal.
