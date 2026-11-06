@@ -2,6 +2,11 @@
 
 A lightweight, clean, and responsive Time Planner web application built purely with HTML, CSS, and modern JavaScript. All task data persists locally in your browser using `localStorage`—no servers, backend, database, or login required.
 
+## Live Demo
+
+Try the app directly in your browser:
+**[https://dollpea1.github.io/time-planner/](https://dollpea1.github.io/time-planner/)**
+
 ## Features
 
 - **Add Tasks**: Plan tasks with Task Name, Date, and Time.
