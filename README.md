@@ -23,3 +23,4 @@ Open `index.html` in any modern web browser. That's it!
 - **HTML5**
 - **CSS3** (Flexbox, CSS Variables, Responsive Design)
 - **JavaScript** (ES6+, DOM Manipulation, LocalStorage API)
+
